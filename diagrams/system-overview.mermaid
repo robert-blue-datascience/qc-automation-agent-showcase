@@ -1,0 +1,49 @@
+flowchart TD
+    WL[Operator Whitelist\nYAML config] --> ORC
+
+    subgraph ORC["Orchestrator (LangGraph — 10 nodes)"]
+        SG([security_gate]) --> DW([discover_wells])
+        DW --> IR([initialize_run])
+        IR --> SW([select_well])
+        SW -->|well found| PC([process_check\nasyncio.gather — two waves])
+        SW -->|not found| SWR([save_well_results])
+        PC -->|checks remain| PC
+        PC -->|all checks done| SWR
+        SWR -->|wells remain| SW
+        SWR -->|queue empty| GR([generate_report])
+        GR --> PS([publish_supabase])
+        PS --> PM([publish_monday])
+        PM --> CL([cleanup])
+    end
+
+    subgraph API["API Layer (httpx async)"]
+        AC[APIClient\nJWT auto-refresh]
+        AD[api_adapter.py\nPure translation\nJSON -> extracted_data dict]
+        RC[(resource_cache\nPer-well, cleared between wells)]
+    end
+
+    subgraph RE["Rule Engine (Pure Python, deterministic)"]
+        ENG[RuleEngine.evaluate\ncheck_name + extracted_data]
+        YAML[config/modules/*.yaml\n30 YAML configs]
+        MODS["10 evaluation modules\n(witsml, surveys, bha, mud, etc.)"]
+        ENG --> YAML
+        YAML --> MODS
+    end
+
+    subgraph OUT["Reporter Layer"]
+        SCO[score_calculator.py\nWeighted average over numeric checks]
+        SUP[(Supabase\nScore-of-record\nPer-well results)]
+        MON[Monday.com GraphQL\nOperator summary row]
+    end
+
+    subgraph GRD["Guardrails (Cross-cutting)"]
+        GATE[SecurityGate\nStartup only]
+        RL[RateLimiter\nToken bucket]
+        AL[AuditLogger\nStructured events]
+        LS[LogSanitizer\nScrubs secrets]
+    end
+
+    ORC --> |fetch + adapt| API
+    API --> |extracted_data dict| RE
+    RE --> |CheckResult per check| OUT
+    GRD -.-> ORC
