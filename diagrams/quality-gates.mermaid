@@ -2,15 +2,15 @@ flowchart LR
     CODE[Code Change\nor New Implementation] --> L1
 
     subgraph L1["Layer 1: /review"]
-        R1[Rob reads every diff\nComprehension gate passed\nbefore merging]
+        R1[Developer reads every diff\nComprehension gate passed\nbefore merging]
     end
 
     subgraph L2["Layer 2: /verify"]
-        R2[Slash command confirms\ndesign assumptions understood\nAdded after April 3 incident]
+        R2[Slash command confirms\ndesign assumptions understood\nAdded after production scoring incident]
     end
 
     subgraph L3["Layer 3: /code-review"]
-        R3[Gemini Code Reviewer Gem\nIndependent architectural review\nSeparate from implementer]
+        R3[Independent AI Code Reviewer\nArchitectural review\nSeparate from implementer]
     end
 
     subgraph L4["Layer 4: pip-audit"]
@@ -18,7 +18,7 @@ flowchart LR
     end
 
     subgraph L5["Layer 5: Security Sweep"]
-        R5[Gemini SecReview Gem\n/sec-sweep on trigger\n/sec-batch for full audit\nAST-based static analysis]
+        R5[Independent AI Security Reviewer\n/sec-sweep on trigger\n/sec-batch for full audit\nAST-based static analysis]
     end
 
     L1 --> L2 --> L3 --> L4 --> L5 --> MERGE[Ready to Merge]

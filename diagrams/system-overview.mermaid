@@ -11,9 +11,9 @@ flowchart TD
         PC -->|all checks done| SWR
         SWR -->|wells remain| SW
         SWR -->|queue empty| GR([generate_report])
-        GR --> PS([publish_supabase])
-        PS --> PM([publish_monday])
-        PM --> CL([cleanup])
+        GR --> PDB([publish_database])
+        PDB --> PDash([publish_dashboard])
+        PDash --> CL([cleanup])
     end
 
     subgraph API["API Layer (httpx async)"]
@@ -25,15 +25,15 @@ flowchart TD
     subgraph RE["Rule Engine (Pure Python, deterministic)"]
         ENG[RuleEngine.evaluate\ncheck_name + extracted_data]
         YAML[config/modules/*.yaml\n30 YAML configs]
-        MODS["10 evaluation modules\n(witsml, surveys, bha, mud, etc.)"]
+        MODS["10 evaluation modules\nacross 6 check categories"]
         ENG --> YAML
         YAML --> MODS
     end
 
     subgraph OUT["Reporter Layer"]
         SCO[score_calculator.py\nWeighted average over numeric checks]
-        SUP[(Supabase\nScore-of-record\nPer-well results)]
-        MON[Monday.com GraphQL\nOperator summary row]
+        DB[(Score-of-Record Database\nPer-well results)]
+        DASH[Dashboard GraphQL\nOperator summary row]
     end
 
     subgraph GRD["Guardrails (Cross-cutting)"]

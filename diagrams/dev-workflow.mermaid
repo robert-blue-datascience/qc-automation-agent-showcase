@@ -1,7 +1,7 @@
 flowchart TD
     subgraph DA["Claude.ai (Architect)"]
         SPEC[Write SPEC.md\nRequirements and constraints]
-        ADR[Architecture Decision Records\nADR-QC-001 through ADR-QC-004]
+        ADR[Architecture Decision Records\nWHAT and WHY for every\nnon-trivial decision]
         BLUE[Produce implementation blueprint\nMethod signatures, design constraints,\ntest cases, interface contracts]
         SPEC --> ADR --> BLUE
     end
@@ -11,7 +11,7 @@ flowchart TD
         IMPL[Write full implementation\nwith tests]
         TEST[Run tests\nReport results]
         SA[Static analysis\nAST-based security scan]
-        DIFF[Generate review.diff\nfor Rob's review session]
+        DIFF[Generate review.diff\nfor developer review session]
         READ --> IMPL --> TEST --> SA --> DIFF
     end
 
@@ -21,7 +21,7 @@ flowchart TD
         GDR[Doc Reviewer Gem\nDocumentation clarity\nADR quality]
     end
 
-    subgraph ROB["Rob (Architect + Approver)"]
+    subgraph DEV["Developer (Architect + Approver)"]
         GATE[Comprehension Gate\nExplain every design decision\nbefore implementation ships]
         REVIEW[Review implementation\nApprove commit]
     end
@@ -29,13 +29,13 @@ flowchart TD
     BLUE --> READ
     DIFF --> GCR
     DIFF --> GSR
-    DIFF --> ROB
+    DIFF --> DEV
     GCR --> REVIEW
     GSR --> REVIEW
     GATE --> BLUE
-    REVIEW --> COMMIT[git commit\nRob approves explicitly]
+    REVIEW --> COMMIT[git commit\nDeveloper approves explicitly]
 
     style DA fill:#4a90d9,color:#fff
     style CC fill:#e8a838,color:#fff
     style GEM fill:#d96a4a,color:#fff
-    style ROB fill:#5ba585,color:#fff
+    style DEV fill:#5ba585,color:#fff
